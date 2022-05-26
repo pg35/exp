@@ -10,9 +10,11 @@ const Container = styled.div`
 export default class App extends Component {
   state = InitialData;
   handleDragStart = (result) => {
-    console.log("start", result);
     document.body.style.color = "blue";
     document.body.style.transition = "background-color 0.2s ease";
+    this.setState({
+      homeIndex: this.state.columnOrder.indexOf(result.source.droppableId)
+    });
   };
   onDragUpdate = (update) => {
     const { destination } = update;
@@ -22,6 +24,9 @@ export default class App extends Component {
     document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`;
   };
   handleDragEnd = (result) => {
+    this.setState({
+      homeIndex: null
+    });
     document.body.style.color = "inherit";
     document.body.style.backgroundColor = "inherit";
     const { draggableId, source, destination } = result;
@@ -71,7 +76,15 @@ export default class App extends Component {
             const tasks = column.taskIds.map(
               (taskId) => this.state.tasks[taskId]
             );
-            return <Column key={column.id} column={column} tasks={tasks} />;
+            const isDropDisabled = index < this.state.homeIndex;
+            return (
+              <Column
+                key={column.id}
+                column={column}
+                tasks={tasks}
+                isDropDisabled={isDropDisabled}
+              />
+            );
           })}
         </DragDropContext>
       </Container>
